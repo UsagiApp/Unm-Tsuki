@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "com.github.UsagiApp"
-version = "1.0.0"
+group = "com.draken"
+version = "1.0.1"
 
 kotlin {
     jvmToolchain(11)
@@ -55,11 +55,8 @@ dependencies {
 
 publishing {
     publications {
-        create<MavenPublication>("library") {
+        create<MavenPublication>("maven") {
             from(components["java"])
-            groupId = "org.draken"
-            artifactId = "tsuki"
-            version = project.version.toString()
         }
     }
     repositories {
