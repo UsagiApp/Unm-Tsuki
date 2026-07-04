@@ -36,15 +36,6 @@ tasks.matching {
     enabled = false
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-            artifactId = "Tsuki"
-        }
-    }
-}
-
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
