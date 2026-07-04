@@ -61,3 +61,24 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.quickjs)
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("library") {
+            from(components["java"])
+            groupId = "org.draken"
+            artifactId = "tsuki"
+            version = project.version.toString()
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/UsagiApp/Tsuki")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: ""
+                password = System.getenv("GITHUB_TOKEN") ?: ""
+            }
+        }
+    }
+}
