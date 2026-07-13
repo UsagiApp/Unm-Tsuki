@@ -2,20 +2,20 @@ package tsuki.core
 
 import androidx.annotation.VisibleForTesting
 import tsuki.InternalParsersApi
-import tsuki.MangaLoaderContext
-import tsuki.model.Manga
-import tsuki.model.MangaListFilter
-import tsuki.model.MangaSource
+import tsuki.MediaLoaderContext
+import tsuki.model.Media
+import tsuki.model.MediaListFilter
+import tsuki.model.MediaSource
 import tsuki.model.SortOrder
 import tsuki.util.Paginator
 
 @InternalParsersApi
-public abstract class PagedMangaParser(
-	context: MangaLoaderContext,
-	source: MangaSource,
+public abstract class PagedMediaParser(
+	context: MediaLoaderContext,
+	source: MediaSource,
 	@VisibleForTesting(otherwise = VisibleForTesting.PROTECTED) @JvmField public val pageSize: Int,
 	searchPageSize: Int = pageSize,
-) : AbstractMangaParser(context, source) {
+) : AbstractMediaParser(context, source) {
 
 	@JvmField
 	protected val paginator: Paginator = Paginator(pageSize)
@@ -23,7 +23,7 @@ public abstract class PagedMangaParser(
 	@JvmField
 	protected val searchPaginator: Paginator = Paginator(searchPageSize)
 
-	final override suspend fun getList(offset: Int, order: SortOrder, filter: MangaListFilter): List<Manga> {
+	final override suspend fun getList(offset: Int, order: SortOrder, filter: MediaListFilter): List<Media> {
 		return getList(
 			paginator = if (filter.query.isNullOrEmpty()) {
 				paginator
@@ -36,7 +36,7 @@ public abstract class PagedMangaParser(
 		)
 	}
 
-	public abstract suspend fun getListPage(page: Int, order: SortOrder, filter: MangaListFilter): List<Manga>
+	public abstract suspend fun getListPage(page: Int, order: SortOrder, filter: MediaListFilter): List<Media>
 
 	protected fun setFirstPage(firstPage: Int, firstPageForSearch: Int = firstPage) {
 		paginator.firstPage = firstPage
@@ -47,8 +47,8 @@ public abstract class PagedMangaParser(
 		paginator: Paginator,
 		offset: Int,
 		order: SortOrder,
-		filter: MangaListFilter,
-	): List<Manga> {
+		filter: MediaListFilter,
+	): List<Media> {
 		val page = paginator.getPage(offset)
 		val list = getListPage(page, order, filter)
 		paginator.onListReceived(offset, page, list.size)

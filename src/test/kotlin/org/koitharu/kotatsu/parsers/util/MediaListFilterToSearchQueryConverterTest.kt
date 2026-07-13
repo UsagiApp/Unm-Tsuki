@@ -3,10 +3,10 @@ package tsuki.util
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import tsuki.model.*
-import tsuki.model.ContentType.MANGA
+import tsuki.model.ContentType.ANIME
 import tsuki.model.ContentType.MANHUA
 import tsuki.model.Demographic.SEINEN
-import tsuki.model.search.MangaSearchQuery
+import tsuki.model.search.MediaSearchQuery
 import tsuki.model.search.QueryCriteria.*
 import tsuki.model.search.SearchableField.*
 import java.util.*
@@ -14,15 +14,15 @@ import java.util.*
 class ListFilterToSearchQueryConverterTest {
 
     @Test
-    fun convertToMangaSearchQueryTest() {
-        val tags = setOf(buildMangaTag("tag1"), buildMangaTag("tag2"))
-        val excludedTags = setOf(buildMangaTag("exclude_tag"))
-        val states = setOf(MangaState.ONGOING)
+    fun convertToMediaSearchQueryTest() {
+        val tags = setOf(buildMediaTag("tag1"), buildMediaTag("tag2"))
+        val excludedTags = setOf(buildMediaTag("exclude_tag"))
+        val states = setOf(MediaState.ONGOING)
         val contentRatings = setOf(ContentRating.SAFE)
-        val contentTypes = setOf(MANGA, MANHUA)
+        val contentTypes = setOf(ANIME, MOVIE)
         val demographics = setOf(SEINEN)
 
-        val filter = MangaListFilter(
+        val filter = MediaListFilter(
             query = "title_name",
             tags = tags,
             tagsExclude = excludedTags,
@@ -37,9 +37,9 @@ class ListFilterToSearchQueryConverterTest {
             yearTo = 2024,
         )
 
-        val searchQuery = convertToMangaSearchQuery(0, SortOrder.NEWEST, filter)
+        val searchQuery = convertToMediaSearchQuery(0, SortOrder.NEWEST, filter)
 
-        val expectedQuery = MangaSearchQuery.Builder()
+        val expectedQuery = MediaSearchQuery.Builder()
             .offset(0)
             .order(SortOrder.NEWEST)
             .criterion(Match(TITLE_NAME, "title_name"))
@@ -59,19 +59,19 @@ class ListFilterToSearchQueryConverterTest {
     }
 
     @Test
-    fun convertToMangaSearchQueryWithEmptyFieldsTest() {
-        val filter = MangaListFilter()
+    fun convertToMediaSearchQueryWithEmptyFieldsTest() {
+        val filter = MediaListFilter()
 
-        val searchQuery = convertToMangaSearchQuery(0, SortOrder.NEWEST, filter)
+        val searchQuery = convertToMediaSearchQuery(0, SortOrder.NEWEST, filter)
 
-        assertEquals(MangaSearchQuery.Builder().offset(0).order(SortOrder.NEWEST).build(), searchQuery)
+        assertEquals(MediaSearchQuery.Builder().offset(0).order(SortOrder.NEWEST).build(), searchQuery)
     }
 
-    private fun buildMangaTag(name: String): MangaTag {
-        return MangaTag(
+    private fun buildMediaTag(name: String): MediaTag {
+        return MediaTag(
             key = "${name}Key",
             title = name,
-            source = MangaParserSource.MANGADEX,
+            source = MediaParserSource.MANGADEX,
         )
     }
 }

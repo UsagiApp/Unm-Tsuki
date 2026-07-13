@@ -3,16 +3,16 @@ package tsuki.model.search
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import tsuki.model.MangaParserSource
-import tsuki.model.MangaState
-import tsuki.model.MangaTag
+import tsuki.model.MediaParserSource
+import tsuki.model.MediaState
+import tsuki.model.MediaTag
 import tsuki.model.search.QueryCriteria.*
 import tsuki.model.search.SearchableField.*
 import java.util.*
 
-class MangaSearchQueryCapabilitiesTest {
+class MediaSearchQueryCapabilitiesTest {
 
-    private val capabilities = MangaSearchQueryCapabilities(
+    private val capabilities = MediaSearchQueryCapabilities(
         capabilities = setOf(
             SearchCapability(TITLE_NAME, setOf(Match::class), isMultiple = false, isExclusive = true),
             SearchCapability(TAG, setOf(Include::class, Exclude::class), isMultiple = true, isExclusive = false),
@@ -23,7 +23,7 @@ class MangaSearchQueryCapabilitiesTest {
 
     @Test
     fun validateValidSingleCriterionQuery() {
-        val query = MangaSearchQuery.Builder()
+        val query = MediaSearchQuery.Builder()
             .criterion(Match(TITLE_NAME, "title"))
             .build()
 
@@ -32,7 +32,7 @@ class MangaSearchQueryCapabilitiesTest {
 
     @Test
     fun validateUnsupportedFieldThrowsException() {
-        val query = MangaSearchQuery.Builder()
+        val query = MediaSearchQuery.Builder()
             .criterion(Include(ORIGINAL_LANGUAGE, setOf(Locale.ENGLISH)))
             .build()
 
@@ -41,8 +41,8 @@ class MangaSearchQueryCapabilitiesTest {
 
     @Test
     fun validateUnsupportedMultiValueThrowsException() {
-        val query = MangaSearchQuery.Builder()
-            .criterion(Include(STATE, setOf(MangaState.ONGOING, MangaState.FINISHED)))
+        val query = MediaSearchQuery.Builder()
+            .criterion(Include(STATE, setOf(MediaState.ONGOING, MediaState.FINISHED)))
             .build()
 
         assertThrows(IllegalArgumentException::class.java) { capabilities.validate(query) }
@@ -50,7 +50,7 @@ class MangaSearchQueryCapabilitiesTest {
 
     @Test
     fun validateMultipleCriteriaWithOtherCriteriaAllowed() {
-        val query = MangaSearchQuery.Builder()
+        val query = MediaSearchQuery.Builder()
             .criterion(Include(TAG, setOf(buildTag("tag1"), buildTag("tag2"))))
             .criterion(Exclude(TAG, setOf(buildTag("tag3"))))
             .build()
@@ -60,7 +60,7 @@ class MangaSearchQueryCapabilitiesTest {
 
     @Test
     fun validateMultipleCriteriaWithStrictCapabilityThrowsException() {
-        val query = MangaSearchQuery.Builder()
+        val query = MediaSearchQuery.Builder()
             .criterion(Match(TITLE_NAME, "title"))
             .criterion(Range(PUBLICATION_YEAR, 1990, 2000))
             .build()
@@ -68,5 +68,5 @@ class MangaSearchQueryCapabilitiesTest {
         assertThrows(IllegalArgumentException::class.java) { capabilities.validate(query) }
     }
 
-    private fun buildTag(name: String) = MangaTag(title = name, key = "${name}Key", source = MangaParserSource.MANGADEX)
+    private fun buildTag(name: String) = MediaTag(title = name, key = "${name}Key", source = MediaParserSource.MANGADEX)
 }

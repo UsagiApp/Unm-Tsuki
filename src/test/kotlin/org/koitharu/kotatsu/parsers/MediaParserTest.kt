@@ -5,10 +5,10 @@ import okhttp3.HttpUrl
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.params.ParameterizedTest
-import tsuki.core.PagedMangaParser
-import tsuki.core.SinglePageMangaParser
+import tsuki.core.PagedMediaParser
+import tsuki.core.SinglePageMediaParser
 import tsuki.model.*
-import tsuki.model.search.MangaSearchQuery
+import tsuki.model.search.MediaSearchQuery
 import tsuki.model.search.QueryCriteria
 import tsuki.model.search.QueryCriteria.Include
 import tsuki.model.search.SearchableField.*
@@ -18,31 +18,31 @@ import org.koitharu.kotatsu.test_util.*
 import kotlin.time.Duration.Companion.minutes
 
 //@ExtendWith(AuthCheckExtension::class)
-internal class MangaParserTest {
+internal class MediaParserTest {
 
-	private val context = MangaLoaderContextMock
+	private val context = MediaLoaderContextMock
 	private val timeout = 2.minutes
 
 	@ParameterizedTest(name = "{index}|list|{0}")
-	@MangaSources
-	fun list(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun list(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
-		val list = parser.getList(MangaSearchQuery.Builder().build())
-		checkMangaList(list, "list")
+		val list = parser.getList(MediaSearchQuery.Builder().build())
+		checkMediaList(list, "list")
 		assert(list.all { it.source == source })
 	}
 
 	@ParameterizedTest(name = "{index}|pagination|{0}")
-	@MangaSources
-	fun pagination(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun pagination(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
-		if (parser is SinglePageMangaParser) {
+		if (parser is SinglePageMediaParser) {
 			return@runTest
 		}
-		val page1 = parser.getList(MangaSearchQuery.EMPTY)
+		val page1 = parser.getList(MediaSearchQuery.EMPTY)
 		val page2 =
-			parser.getList(MangaSearchQuery.Builder().offset(page1.size).build())
-		if (parser is PagedMangaParser) {
+			parser.getList(MediaSearchQuery.Builder().offset(page1.size).build())
+		if (parser is PagedMediaParser) {
 			assert(parser.pageSize >= page1.size) {
 				"Page size is ${page1.size} but ${parser.pageSize} expected"
 			}
@@ -57,17 +57,17 @@ internal class MangaParserTest {
 	}
 
 	@ParameterizedTest(name = "{index}|search|{0}")
-	@MangaSources
-	fun searchByTitleName(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun searchByTitleName(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
-		val subject = parser.getList(MangaSearchQuery.EMPTY).minByOrNull {
+		val subject = parser.getList(MediaSearchQuery.EMPTY).minByOrNull {
 			it.title.length
-		} ?: error("No manga found")
+		} ?: error("No media found")
 
 		val query = subject.title
-		check(query.isNotBlank()) { "Manga title '$query' is blank" }
+		check(query.isNotBlank()) { "Media title '$query' is blank" }
 		val list = parser.getList(
-			MangaSearchQuery.Builder()
+			MediaSearchQuery.Builder()
 				.order(SortOrder.RELEVANCE)
 				.criterion(QueryCriteria.Match(TITLE_NAME, query))
 				.build(),
@@ -76,13 +76,13 @@ internal class MangaParserTest {
 		assert(list.singleOrNull { it.url == subject.url && it.id == subject.id } != null) {
 			"Single subject '${subject.title} (${subject.publicUrl})' not found in search results"
 		}
-		checkMangaList(list, "search('$query')")
+		checkMediaList(list, "search('$query')")
 		assert(list.all { it.source == source })
 	}
 
 	@ParameterizedTest(name = "{index}|tags|{0}")
-	@MangaSources
-	fun tags(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun tags(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
 		val tags = parser.getFilterOptions().availableTags
 		assert(tags.isNotEmpty()) { "No tags found" }
@@ -100,36 +100,36 @@ internal class MangaParserTest {
 
 		val tag = tags.last()
 		val list = parser.getList(
-			MangaSearchQuery.Builder()
+			MediaSearchQuery.Builder()
 				.offset(0)
 				.criterion(Include(TAG, setOf(tag)))
 				.build(),
 		)
-		checkMangaList(list, "${tag.title} (${tag.key})")
+		checkMediaList(list, "${tag.title} (${tag.key})")
 		assert(list.all { it.source == source })
 	}
 
 	@ParameterizedTest(name = "{index}|tags_multiple|{0}")
-	@MangaSources
-	fun tagsMultiple(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun tagsMultiple(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
 //		if (!parser.filterCapabilities.isMultipleTagsSupported) return@runTest
 		val tags = parser.getFilterOptions().availableTags.shuffled().take(2).toSet()
 
 		val list = parser.getList(
-			MangaSearchQuery.Builder()
+			MediaSearchQuery.Builder()
 				.offset(0)
 				.criterion(Include(TAG, tags))
 				.build(),
 		)
 
-		checkMangaList(list, "${tags.joinToString { it.title }} (${tags.joinToString { it.key }})")
+		checkMediaList(list, "${tags.joinToString { it.title }} (${tags.joinToString { it.key }})")
 		assert(list.all { it.source == source })
 	}
 
 	@ParameterizedTest(name = "{index}|locale|{0}")
-	@MangaSources
-	fun locale(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun locale(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
 		val locales = parser.getFilterOptions().availableLocales
 		if (locales.isEmpty()) {
@@ -137,30 +137,30 @@ internal class MangaParserTest {
 		}
 		val locale = locales.random()
 		val list = parser.getList(
-			MangaSearchQuery.Builder()
+			MediaSearchQuery.Builder()
 				.criterion(Include(LANGUAGE, setOf(locale)))
 				.criterion(Include(LANGUAGE, setOf(locale)))
 				.criterion(Include(ORIGINAL_LANGUAGE, setOf(locales.random())))
 				.build(),
 		)
-		checkMangaList(list, locale.toString())
+		checkMediaList(list, locale.toString())
 		assert(list.all { it.source == source })
 	}
 
 
 	@ParameterizedTest(name = "{index}|details|{0}")
-	@MangaSources
-	fun details(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun details(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
-		val list = parser.getList(MangaSearchQuery.EMPTY)
+		val list = parser.getList(MediaSearchQuery.EMPTY)
 
-		val manga = list.random()
-		parser.getDetails(manga).apply {
+		val media = list.random()
+		parser.getDetails(media).apply {
 			assert(!chapters.isNullOrEmpty()) { "Chapters are null or empty" }
-			assert(publicUrl.isUrlAbsolute()) { "Manga public url is not absolute: '$publicUrl'" }
+			assert(publicUrl.isUrlAbsolute()) { "Media public url is not absolute: '$publicUrl'" }
 			assert(description != null) { "Detailed description is null: '$publicUrl'" }
-			assert(title.startsWith(manga.title)) {
-				"Titles are mismatch: '$title' and '${manga.title}' for $publicUrl"
+			assert(title.startsWith(media.title)) {
+				"Titles are mismatch: '$title' and '${media.title}' for $publicUrl"
 			}
 			assert(this.source == source)
 			val c = checkNotNull(chapters)
@@ -180,13 +180,13 @@ internal class MangaParserTest {
 	}
 
 	@ParameterizedTest(name = "{index}|pages|{0}")
-	@MangaSources
-	fun pages(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun pages(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
-		val list = parser.getList(MangaSearchQuery.EMPTY)
-		val manga = list.first()
-		val chapter = parser.getDetails(manga).chapters?.firstOrNull() ?: error("Chapter is null at ${manga.publicUrl}")
-		val pages = parser.getPages(chapter)
+		val list = parser.getList(MediaSearchQuery.EMPTY)
+		val media = list.first()
+		val episode = parser.getDetails(media).episodes?.firstOrNull() ?: error("Episode is null at ${media.publicUrl}")
+		val pages = parser.getVideoSources(episode)
 
 		assert(pages.isNotEmpty())
 		assert(pages.isDistinctBy { it.id })
@@ -196,7 +196,7 @@ internal class MangaParserTest {
 			pages.first(),
 			pages.medianOrNull() ?: error("No page"),
 		).forEach { page ->
-			val pageUrl = parser.getPageUrl(page)
+			val pageUrl = parser.getVideoUrl(page)
 			assert(pageUrl.isNotEmpty())
 			assert(pageUrl.isUrlAbsolute())
 			checkImageRequest(pageUrl, page.source)
@@ -204,8 +204,8 @@ internal class MangaParserTest {
 	}
 
 	@ParameterizedTest(name = "{index}|favicon|{0}")
-	@MangaSources
-	fun favicon(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun favicon(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
 		val favicons = parser.getFavicons()
 		val types = setOf("png", "svg", "ico", "gif", "jpg", "jpeg", "webp", "avif")
@@ -220,8 +220,8 @@ internal class MangaParserTest {
 	}
 
 	@ParameterizedTest(name = "{index}|domain|{0}")
-	@MangaSources
-	fun domain(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun domain(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
 		val defaultDomain = parser.domain
 		val url = HttpUrl.Builder().host(defaultDomain).scheme("https").toString()
@@ -235,34 +235,34 @@ internal class MangaParserTest {
 	}
 
 	@ParameterizedTest(name = "{index}|link|{0}")
-	@MangaSources
-	fun link(source: MangaParserSource) = runTest(timeout = timeout) {
+	@MediaSources
+	fun link(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
-		val manga = parser.getList(MangaSearchQuery.Builder().build()).first()
-		val resolved = context.newLinkResolver(manga.publicUrl).getManga()
+		val media = parser.getList(MediaSearchQuery.Builder().build()).first()
+		val resolved = context.newLinkResolver(media.publicUrl).getMedia()
 		Assertions.assertNotNull(resolved)
 		resolved ?: return@runTest
-		Assertions.assertEquals(manga.id, resolved.id)
-		Assertions.assertEquals(manga.publicUrl, resolved.publicUrl)
-		Assertions.assertEquals(manga.url, resolved.url)
-		Assertions.assertEquals(manga.title, resolved.title)
+		Assertions.assertEquals(media.id, resolved.id)
+		Assertions.assertEquals(media.publicUrl, resolved.publicUrl)
+		Assertions.assertEquals(media.url, resolved.url)
+		Assertions.assertEquals(media.title, resolved.title)
 	}
 
 	@ParameterizedTest(name = "{index}|authorization|{0}")
-	@MangaSources
+	@MediaSources
 	@Disabled
-	fun authorization(source: MangaParserSource) = runTest(timeout = timeout) {
+	fun authorization(source: MediaParserSource) = runTest(timeout = timeout) {
 		val parser = context.newParserInstance(source)
-		if (parser is MangaParserAuthProvider) {
+		if (parser is MediaParserAuthProvider) {
 			val username = parser.getUsername()
 			assert(username.isNotBlank()) { "Username is blank" }
 			println("Signed in to ${source.name} as $username")
 		}
 	}
 
-	private suspend fun checkMangaList(list: List<Manga>, cause: String) {
-		assert(list.isNotEmpty()) { "Manga list for '$cause' is empty" }
-		assert(list.isDistinctBy { it.id }) { "Manga list for '$cause' contains duplicated ids" }
+	private suspend fun checkMediaList(list: List<Media>, cause: String) {
+		assert(list.isNotEmpty()) { "Media list for '$cause' is empty" }
+		assert(list.isDistinctBy { it.id }) { "Media list for '$cause' contains duplicated ids" }
 		for (item in list) {
 			assert(item.url.isNotEmpty()) { "Url is empty" }
 			assert(!item.url.isUrlAbsolute()) { "Url looks like absolute: ${item.url}" }
@@ -276,7 +276,7 @@ internal class MangaParserTest {
 		checkImageRequest(testItem.coverUrl, testItem.source)
 	}
 
-	private suspend fun checkImageRequest(url: String?, source: MangaSource) {
+	private suspend fun checkImageRequest(url: String?, source: MediaSource) {
 		if (url == null) {
 			return
 		}
@@ -292,7 +292,7 @@ internal class MangaParserTest {
 		return !first().isLowerCase()
 	}
 
-	private fun MangaChapter.key(): Any? = when {
+	private fun Episode.key(): Any? = when {
 		number > 0f && volume > 0 -> Triple(branch, volume, number)
 		number > 0f -> Pair(branch, number)
 		else -> null

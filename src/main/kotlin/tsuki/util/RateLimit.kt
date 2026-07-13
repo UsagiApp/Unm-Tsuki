@@ -28,8 +28,8 @@ public fun OkHttpClient.Builder.rateLimit(
  * An OkHttp interceptor that handles given url host's rate limiting.
  *
  * Examples:
- * - `url = "https://api.manga.example"`, `permits = 5`, `period = 1.seconds` =>  5 requests per second to any url with host "api.manga.example"
- * - `url = "https://cdn.manga.example/image"`, `permits = 10`, `period = 2.minutes`  =>  10 requests per 2 minutes to any url with host "cdn.manga.example"
+ * - `url = "https://api.media.example"`, `permits = 5`, `period = 1.seconds` =>  5 requests per second to any url with host "api.media.example"
+ * - `url = "https://cdn.media.example/image"`, `permits = 10`, `period = 2.minutes`  =>  10 requests per 2 minutes to any url with host "cdn.media.example"
  *
  * @param url [String]      The url host that this interceptor should handle. Will get url's host by using HttpUrl.host()
  * @param permits [Int]     Number of requests allowed within a period of units.
@@ -46,8 +46,8 @@ public fun OkHttpClient.Builder.rateLimit(
  * An OkHttp interceptor that handles given url host's rate limiting.
  *
  * Examples:
- * - `httpUrl = "https://api.manga.example".toHttpUrlOrNull()`, `permits = 5`, `period = 1.seconds` =>  5 requests per second to any url with host "api.manga.example"
- * - `httpUrl = "https://cdn.manga.example/image".toHttpUrlOrNull()`, `permits = 10`, `period = 2.minutes` =>  10 requests per 2 minutes to any url with host "cdn.manga.example
+ * - `httpUrl = "https://api.media.example".toHttpUrlOrNull()`, `permits = 5`, `period = 1.seconds` =>  5 requests per second to any url with host "api.media.example"
+ * - `httpUrl = "https://cdn.media.example/image".toHttpUrlOrNull()`, `permits = 10`, `period = 2.minutes` =>  10 requests per 2 minutes to any url with host "cdn.media.example
  *
  * @param httpUrl [HttpUrl] The url host that this interceptor should handle. Will get url's host by using HttpUrl.host()
  * @param permits [Int]     Number of requests allowed within a period of units.
@@ -64,7 +64,7 @@ public fun OkHttpClient.Builder.rateLimit(
  * An OkHttp interceptor that enforces conditional rate limiting based on a given condition.
  *
  * Examples:
- * - `permits = 5`, `period = 1.seconds`, `shouldLimit = { it.host == "api.manga.example" }` => 5 requests per second to any url with host "api.manga.example".
+ * - `permits = 5`, `period = 1.seconds`, `shouldLimit = { it.host == "api.media.example" }` => 5 requests per second to any url with host "api.media.example".
  * - `permits = 10`, `period = 2.minutes`, `shouldLimit = { it.encodedPath.startsWith("/images/") }` => 10 requests per 2 minutes to paths starting with "/images/".
  *
  * @param permits [Int]     Number of requests allowed within a period of units.

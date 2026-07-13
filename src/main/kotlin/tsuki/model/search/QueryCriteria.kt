@@ -3,7 +3,7 @@
 package tsuki.model.search
 
 /**
- * Represents a generic search criterion used for filtering manga search results.
+ * Represents a generic search criterion used for filtering media search results.
  * Each criterion applies a specific condition to a [SearchableField] and operates on values of type [T].
  *
  * @param T The type of value associated with the search criterion.
@@ -26,7 +26,7 @@ public sealed interface QueryCriteria<T> {
 	 *
 	 * ### Example Usage:
 	 * ```kotlin
-	 * val genreFilter = QueryCriteria.Include(SearchableField.STATE, setOf(MangaState.ONGOING, MangaState.FINISHED))
+	 * val genreFilter = QueryCriteria.Include(SearchableField.STATE, setOf(MediaState.ONGOING, MediaState.FINISHED))
 	 * ```
 	 */
 	public data class Include<T : Any>(
@@ -47,7 +47,7 @@ public sealed interface QueryCriteria<T> {
 	 *
 	 * ### Example Usage:
 	 * ```kotlin
-	 * val excludeTag = QueryCriteria.Exclude(SearchableField.TAG, setOf(MangaTag(key, title, source)))
+	 * val excludeTag = QueryCriteria.Exclude(SearchableField.TAG, setOf(MediaTag(key, title, source)))
 	 * ```
 	 */
 	public data class Exclude<T : Any>(
@@ -93,7 +93,7 @@ public sealed interface QueryCriteria<T> {
 	 *
 	 * ### Example Usage:
 	 * ```kotlin
-	 * val titleMatch = QueryCriteria.Match(SearchableField.TITLE, "manga title")
+	 * val titleMatch = QueryCriteria.Match(SearchableField.TITLE, "media title")
 	 * ```
 	 */
 	public data class Match<T : Any>(

@@ -1,8 +1,8 @@
 package tsuki.util
 
 import org.junit.jupiter.api.Test
-import tsuki.MangaLoaderContextMock
-import tsuki.model.MangaParserSource
+import tsuki.MediaLoaderContextMock
+import tsuki.model.MediaParserSource
 import tsuki.newParser
 import java.io.File
 
@@ -21,8 +21,8 @@ class IntentFilterGenerator {
             writer.appendTab().appendLine("<data android:scheme=\"http\" />")
             writer.appendTab().appendLine("<data android:scheme=\"https\" />")
             writer.appendLine()
-            for (source in MangaParserSource.entries) {
-                val parser = source.newParser(MangaLoaderContextMock)
+            for (source in MediaParserSource.entries) {
+                val parser = source.newParser(MediaLoaderContextMock)
                 parser.configKeyDomain.presetValues.forEach { domain ->
                     writer.appendTab().append("<data android:host=\"").append(domain).appendLine("\" />")
                 }

@@ -3,27 +3,27 @@ package tsuki.util
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import tsuki.MangaLoaderContextMock
-import tsuki.model.MangaParserSource
+import tsuki.MediaLoaderContextMock
+import tsuki.model.MediaParserSource
 import kotlin.time.Duration.Companion.minutes
 
 internal class LinkResolverTest {
 
-	private val context = MangaLoaderContextMock
+	private val context = MediaLoaderContextMock
 
 	@Test
 	fun supportedSource() = runTest(timeout = 2.minutes) {
-		val resolver = context.newLinkResolver("REDACTED" /* do not publish links to manga on GitHub */)
-		Assertions.assertEquals(MangaParserSource.MANGADEX, resolver.getSource())
-		val manga = resolver.getManga()
-		Assertions.assertEquals(resolver.link.toString(), manga?.publicUrl)
+		val resolver = context.newLinkResolver("REDACTED" /* do not publish links to media on GitHub */)
+		Assertions.assertEquals(MediaParserSource.MANGADEX, resolver.getSource())
+		val media = resolver.getMedia()
+		Assertions.assertEquals(resolver.link.toString(), media?.publicUrl)
 	}
 
 	@Test
 	fun unsupportedSource2() = runTest(timeout = 2.minutes) {
-		val resolver = context.newLinkResolver("REDACTED" /* do not publish links to manga on GitHub */)
-		Assertions.assertEquals(MangaParserSource.BATOTO, resolver.getSource())
-		val manga = resolver.getManga()
-		Assertions.assertEquals(resolver.link.toString(), manga?.publicUrl)
+		val resolver = context.newLinkResolver("REDACTED" /* do not publish links to media on GitHub */)
+		Assertions.assertEquals(MediaParserSource.BATOTO, resolver.getSource())
+		val media = resolver.getMedia()
+		Assertions.assertEquals(resolver.link.toString(), media?.publicUrl)
 	}
 }

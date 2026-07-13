@@ -2,10 +2,10 @@
 
 package tsuki.util
 
-import tsuki.MangaLoaderContext
+import tsuki.MediaLoaderContext
 
 public class WebViewHelper(
-	private val context: MangaLoaderContext,
+	private val context: MediaLoaderContext,
 ) {
 
 	public suspend fun getLocalStorageValue(domain: String, key: String): String? {

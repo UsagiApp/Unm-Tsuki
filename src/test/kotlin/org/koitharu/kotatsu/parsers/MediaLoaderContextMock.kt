@@ -7,8 +7,8 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import tsuki.bitmap.Bitmap
-import tsuki.config.MangaSourceConfig
-import tsuki.model.MangaSource
+import tsuki.config.MediaSourceConfig
+import tsuki.model.MediaSource
 import tsuki.network.UserAgents
 import tsuki.util.await
 import tsuki.util.requireBody
@@ -22,7 +22,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
-internal object MangaLoaderContextMock : MangaLoaderContext() {
+internal object MediaLoaderContextMock : MediaLoaderContext() {
 
 	override val cookieJar = InMemoryCookieJar()
 
@@ -49,7 +49,7 @@ internal object MangaLoaderContextMock : MangaLoaderContext() {
 		}
 	}
 
-	override fun getConfig(source: MangaSource): MangaSourceConfig {
+	override fun getConfig(source: MediaSource): MediaSourceConfig {
 		return SourceConfigMock()
 	}
 
@@ -68,12 +68,12 @@ internal object MangaLoaderContextMock : MangaLoaderContext() {
 		return BitmapTestImpl(BufferedImage(width, height, BufferedImage.TYPE_INT_RGB))
 	}
 
-	suspend fun doRequest(url: String, source: MangaSource?): Response {
+	suspend fun doRequest(url: String, source: MediaSource?): Response {
 		val request = Request.Builder()
 			.get()
 			.url(url)
 		if (source != null) {
-			request.tag(MangaSource::class.java, source)
+			request.tag(MediaSource::class.java, source)
 		}
 		return httpClient.newCall(request.build()).await()
 	}

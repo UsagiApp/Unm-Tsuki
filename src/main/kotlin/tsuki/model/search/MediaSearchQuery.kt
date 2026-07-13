@@ -7,7 +7,7 @@ import androidx.collection.ArraySet
 import tsuki.model.SortOrder
 
 /**
- * Represents a search query for filtering and sorting manga search results.
+ * Represents a search query for filtering and sorting media search results.
  * This class is immutable and must be constructed using the [Builder].
  *
  * @property criteria The set of search criteria applied to the query.
@@ -15,9 +15,9 @@ import tsuki.model.SortOrder
  * @property offset The offset number for paginated search results (optional).
  */
 
-@Deprecated("Too complex. Use MangaListFilter instead")
+@Deprecated("Too complex. Use MediaListFilter instead")
 @ConsistentCopyVisibility
-public data class MangaSearchQuery private constructor(
+public data class MediaSearchQuery private constructor(
 	@JvmField public val criteria: Set<QueryCriteria<*>>,
 	@JvmField public val order: SortOrder?,
 	@JvmField public val offset: Int,
@@ -35,7 +35,7 @@ public data class MangaSearchQuery private constructor(
 
 		public constructor()
 
-		public constructor(query: MangaSearchQuery) : this() {
+		public constructor(query: MediaSearchQuery) : this() {
 			criteria.addAll(query.criteria)
 			order = query.order
 			offset = query.offset
@@ -50,8 +50,8 @@ public data class MangaSearchQuery private constructor(
 		public fun skipValidation(skip: Boolean): Builder = apply { this.skipValidation = skip }
 
 		@Throws(IllegalArgumentException::class)
-		public fun build(): MangaSearchQuery {
-			return MangaSearchQuery(deduplicateCriteria(criteria), order, offset, skipValidation)
+		public fun build(): MediaSearchQuery {
+			return MediaSearchQuery(deduplicateCriteria(criteria), order, offset, skipValidation)
 		}
 
 		private fun deduplicateCriteria(criteria: Set<QueryCriteria<*>>): Set<QueryCriteria<*>> {
@@ -87,6 +87,6 @@ public data class MangaSearchQuery private constructor(
 
 	public companion object {
 
-		public val EMPTY: MangaSearchQuery = MangaSearchQuery(emptySet(), null, 0, false)
+		public val EMPTY: MediaSearchQuery = MediaSearchQuery(emptySet(), null, 0, false)
 	}
 }

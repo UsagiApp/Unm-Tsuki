@@ -2,28 +2,28 @@
 
 package tsuki.util
 
-import tsuki.model.MangaListFilter
-import tsuki.model.MangaListFilterCapabilities
+import tsuki.model.MediaListFilter
+import tsuki.model.MediaListFilterCapabilities
 import tsuki.model.SortOrder
 import tsuki.model.YEAR_UNKNOWN
-import tsuki.model.search.MangaSearchQuery
-import tsuki.model.search.MangaSearchQueryCapabilities
+import tsuki.model.search.MediaSearchQuery
+import tsuki.model.search.MediaSearchQueryCapabilities
 import tsuki.model.search.QueryCriteria
 import tsuki.model.search.QueryCriteria.*
 import tsuki.model.search.SearchCapability
 import tsuki.model.search.SearchableField.*
 
 /**
- * Converts a [MangaListFilter] into a [MangaSearchQuery].
+ * Converts a [MediaListFilter] into a [MediaSearchQuery].
  *
- * This function iterates through the filter attributes in [MangaListFilter] and creates corresponding
- * search criteria in a [MangaSearchQuery.Builder].
+ * This function iterates through the filter attributes in [MediaListFilter] and creates corresponding
+ * search criteria in a [MediaSearchQuery.Builder].
  *
- * @param filter The [MangaListFilter] to convert.
- * @return A [MangaSearchQuery] constructed based on the given [filter].
+ * @param filter The [MediaListFilter] to convert.
+ * @return A [MediaSearchQuery] constructed based on the given [filter].
  */
-public fun convertToMangaSearchQuery(offset: Int, sortOrder: SortOrder, filter: MangaListFilter): MangaSearchQuery {
-	return MangaSearchQuery.Builder().apply {
+public fun convertToMediaSearchQuery(offset: Int, sortOrder: SortOrder, filter: MediaListFilter): MediaSearchQuery {
+	return MediaSearchQuery.Builder().apply {
 		offset(offset)
 		order(sortOrder)
 		if (filter.tags.isNotEmpty()) criterion(Include(TAG, filter.tags))
@@ -31,7 +31,6 @@ public fun convertToMangaSearchQuery(offset: Int, sortOrder: SortOrder, filter: 
 		if (filter.states.isNotEmpty()) criterion(Include(STATE, filter.states))
 		if (filter.types.isNotEmpty()) criterion(Include(CONTENT_TYPE, filter.types))
 		if (filter.contentRating.isNotEmpty()) criterion(Include(CONTENT_RATING, filter.contentRating))
-		if (filter.demographics.isNotEmpty()) criterion(Include(DEMOGRAPHIC, filter.demographics))
 		if (validateYear(filter.yearFrom) || validateYear(filter.yearTo)) {
 			criterion(QueryCriteria.Range(PUBLICATION_YEAR, filter.yearFrom, filter.yearTo))
 		}
@@ -51,16 +50,16 @@ public fun convertToMangaSearchQuery(offset: Int, sortOrder: SortOrder, filter: 
 }
 
 /**
- * Converts a {@link MangaSearchQuery} into a {@link MangaListFilter}.
+ * Converts a {@link MediaSearchQuery} into a {@link MediaListFilter}.
  * <p>
  * This method iterates through the search criteria defined in the provided {@code searchQuery}
- * and applies them to a {@link MangaListFilter.Builder}. The criteria are processed based on
+ * and applies them to a {@link MediaListFilter.Builder}. The criteria are processed based on
  * their types, such as inclusion, exclusion, equality checks, range filtering, and pattern matching.
  * </p>
  * <p>
  * Supported criteria:
  * <ul>
- *     <li>{@link QueryCriteria.Include} - Adds tags, states, content types, content ratings, demographics, and languages.</li>
+ *     <li>{@link QueryCriteria.Include} - Adds tags, states, content types, content ratings, and languages.</li>
  *     <li>{@link QueryCriteria.Exclude} - Excludes tags.</li>
  *     <li>{@link QueryCriteria.Equals} - Sets specific values like publication year.</li>
  *     <li>{@link QueryCriteria.Between} - Sets a range of values like publication year range.</li>
@@ -71,12 +70,12 @@ public fun convertToMangaSearchQuery(offset: Int, sortOrder: SortOrder, filter: 
  * If an unsupported field is encountered, an {@link UnsupportedOperationException} is thrown.
  * </p>
  *
- * @param searchQuery The {@link MangaSearchQuery} to convert.
- * @return A {@link MangaListFilter} constructed based on the given {@code searchQuery}.
+ * @param searchQuery The {@link MediaSearchQuery} to convert.
+ * @return A {@link MediaListFilter} constructed based on the given {@code searchQuery}.
  * @throws UnsupportedOperationException If the search criteria contain unsupported fields.
  */
-public fun convertToMangaListFilter(searchQuery: MangaSearchQuery): MangaListFilter {
-	return MangaListFilter.Builder().apply {
+public fun convertToMediaListFilter(searchQuery: MediaSearchQuery): MediaListFilter {
+	return MediaListFilter.Builder().apply {
 		for (criterion in searchQuery.criteria) {
 			when (criterion) {
 				is Include<*> -> handleInclude(this, criterion)
@@ -88,7 +87,7 @@ public fun convertToMangaListFilter(searchQuery: MangaSearchQuery): MangaListFil
 	}.build()
 }
 
-public fun MangaSearchQueryCapabilities.toMangaListFilterCapabilities() = MangaListFilterCapabilities(
+public fun MediaSearchQueryCapabilities.toMediaListFilterCapabilities() = MediaListFilterCapabilities(
 	isMultipleTagsSupported = capabilities.any { x -> x.field == TAG && x.isMultiple },
 	isTagsExclusionSupported = capabilities.any { x -> x.field == TAG && x.criteriaTypes.contains(Exclude::class) },
 	isSearchSupported = capabilities.any { x -> x.field == TITLE_NAME },
@@ -99,8 +98,8 @@ public fun MangaSearchQueryCapabilities.toMangaListFilterCapabilities() = MangaL
 	isAuthorSearchSupported = capabilities.any { x -> x.field == AUTHOR },
 )
 
-public fun MangaListFilterCapabilities.toMangaSearchQueryCapabilities(): MangaSearchQueryCapabilities =
-	MangaSearchQueryCapabilities(
+public fun MediaListFilterCapabilities.toMediaSearchQueryCapabilities(): MediaSearchQueryCapabilities =
+	MediaSearchQueryCapabilities(
 		capabilities = setOfNotNull(
 			isMultipleTagsSupported.takeIf { it }?.let {
 				SearchCapability(
@@ -170,15 +169,10 @@ public fun MangaListFilterCapabilities.toMangaSearchQueryCapabilities(): MangaSe
 				criteriaTypes = setOf(Include::class),
 				isMultiple = true,
 			),
-			SearchCapability(
-				field = DEMOGRAPHIC,
-				criteriaTypes = setOf(Include::class),
-				isMultiple = true,
-			),
 		),
 	)
 
-private fun handleInclude(builder: MangaListFilter.Builder, criterion: Include<*>) {
+private fun handleInclude(builder: MediaListFilter.Builder, criterion: Include<*>) {
 	val type = criterion.field.type
 
 	when (criterion.field) {
@@ -186,14 +180,13 @@ private fun handleInclude(builder: MangaListFilter.Builder, criterion: Include<*
 		STATE -> builder.addStates(filterValues(criterion, type))
 		CONTENT_TYPE -> builder.addTypes(filterValues(criterion, type))
 		CONTENT_RATING -> builder.addContentRatings(filterValues(criterion, type))
-		DEMOGRAPHIC -> builder.addDemographics(filterValues(criterion, type))
 		LANGUAGE -> builder.locale(getFirstValue(criterion, type))
 		ORIGINAL_LANGUAGE -> builder.originalLocale(getFirstValue(criterion, type))
 		else -> throw IllegalArgumentException("Unsupported field for Include criterion: ${criterion.field}")
 	}
 }
 
-private fun handleExclude(builder: MangaListFilter.Builder, criterion: Exclude<*>) {
+private fun handleExclude(builder: MediaListFilter.Builder, criterion: Exclude<*>) {
 	val type = criterion.field.type
 
 	when (criterion.field) {
@@ -202,7 +195,7 @@ private fun handleExclude(builder: MangaListFilter.Builder, criterion: Exclude<*
 	}
 }
 
-private fun handleBetween(builder: MangaListFilter.Builder, criterion: Range<*>) {
+private fun handleBetween(builder: MediaListFilter.Builder, criterion: Range<*>) {
 	val type = criterion.field.type
 
 	when (criterion.field) {
@@ -215,7 +208,7 @@ private fun handleBetween(builder: MangaListFilter.Builder, criterion: Range<*>)
 	}
 }
 
-private fun handleMatch(builder: MangaListFilter.Builder, criterion: Match<*>) {
+private fun handleMatch(builder: MediaListFilter.Builder, criterion: Match<*>) {
 	val type = criterion.field.type
 
 	when (criterion.field) {

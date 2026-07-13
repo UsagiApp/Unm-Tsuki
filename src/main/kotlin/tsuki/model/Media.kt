@@ -4,13 +4,13 @@ import androidx.collection.ArrayMap
 import tsuki.util.findById
 import tsuki.util.nullIfEmpty
 
-public data class Manga(
+public data class Media(
 	/**
-	 * Unique identifier for manga
+	 * Unique identifier for media
 	 */
 	@JvmField public val id: Long,
 	/**
-	 * Manga title, human-readable
+	 * Media title, human-readable
 	 */
 	@JvmField public val title: String,
 	/**
@@ -18,21 +18,21 @@ public data class Manga(
 	 */
 	@JvmField public val altTitles: Set<String>,
 	/**
-	 * Relative url to manga (**without** a domain) or any other uri.
+	 * Relative url to media (**without** a domain) or any other uri.
 	 * Used principally in parsers
 	 */
 	@JvmField public val url: String,
 	/**
-	 * Absolute url to manga, must be ready to open in browser
+	 * Absolute url to media, must be ready to open in browser
 	 */
 	@JvmField public val publicUrl: String,
 	/**
-	 * Normalized manga rating, must be in range of 0..1 or [RATING_UNKNOWN] if rating s unknown
+	 * Normalized media rating, must be in range of 0..1 or [RATING_UNKNOWN] if rating s unknown
 	 * @see hasRating
 	 */
 	@JvmField public val rating: Float,
 	/**
-	 * Indicates that manga may contain sensitive information (18+, NSFW)
+	 * Indicates that media may contain sensitive information (18+, NSFW)
 	 */
 	@JvmField public val contentRating: ContentRating?,
 	/**
@@ -41,15 +41,15 @@ public data class Manga(
 	 */
 	@JvmField public val coverUrl: String?,
 	/**
-	 * Tags (genres) of the manga
+	 * Tags (genres) of the media
 	 */
-	@JvmField public val tags: Set<MangaTag>,
+	@JvmField public val tags: Set<MediaTag>,
 	/**
-	 * Manga status (ongoing, finished) or null if unknown
+	 * Media status (ongoing, finished) or null if unknown
 	 */
-	@JvmField public val state: MangaState?,
+	@JvmField public val state: MediaState?,
 	/**
-	 * Authors of the manga
+	 * Authors of the media
 	 */
 	@JvmField public val authors: Set<String>,
 	/**
@@ -58,27 +58,27 @@ public data class Manga(
 	 */
 	@JvmField public val largeCoverUrl: String? = null,
 	/**
-	 * Manga description, may be html or null
+	 * Media description, may be html or null
 	 */
 	@JvmField public val description: String? = null,
 	/**
 	 * List of chapters
 	 */
-	@JvmField public val chapters: List<MangaChapter>? = null,
+	@JvmField public val chapters: List<Episode>? = null,
 	/**
-	 * Manga source
+	 * Media source
 	 */
-	@JvmField public val source: MangaSource,
+	@JvmField public val source: MediaSource,
 ) {
 
 	@Deprecated("Use other constructor")
 	public constructor(
 		/**
-		 * Unique identifier for manga
+		 * Unique identifier for media
 		 */
 		id: Long,
 		/**
-		 * Manga title, human-readable
+		 * Media title, human-readable
 		 */
 		title: String,
 		/**
@@ -86,21 +86,21 @@ public data class Manga(
 		 */
 		altTitle: String?,
 		/**
-		 * Relative url to manga (**without** a domain) or any other uri.
+		 * Relative url to media (**without** a domain) or any other uri.
 		 * Used principally in parsers
 		 */
 		url: String,
 		/**
-		 * Absolute url to manga, must be ready to open in browser
+		 * Absolute url to media, must be ready to open in browser
 		 */
 		publicUrl: String,
 		/**
-		 * Normalized manga rating, must be in range of 0..1 or [RATING_UNKNOWN] if rating s unknown
+		 * Normalized media rating, must be in range of 0..1 or [RATING_UNKNOWN] if rating s unknown
 		 * @see hasRating
 		 */
 		rating: Float,
 		/**
-		 * Indicates that manga may contain sensitive information (18+, NSFW)
+		 * Indicates that media may contain sensitive information (18+, NSFW)
 		 */
 		isNsfw: Boolean,
 		/**
@@ -109,15 +109,15 @@ public data class Manga(
 		 */
 		coverUrl: String?,
 		/**
-		 * Tags (genres) of the manga
+		 * Tags (genres) of the media
 		 */
-		tags: Set<MangaTag>,
+		tags: Set<MediaTag>,
 		/**
-		 * Manga status (ongoing, finished) or null if unknown
+		 * Media status (ongoing, finished) or null if unknown
 		 */
-		state: MangaState?,
+		state: MediaState?,
 		/**
-		 * Authors of the manga
+		 * Authors of the media
 		 */
 		author: String?,
 		/**
@@ -126,17 +126,17 @@ public data class Manga(
 		 */
 		largeCoverUrl: String? = null,
 		/**
-		 * Manga description, may be html or null
+		 * Media description, may be html or null
 		 */
 		description: String? = null,
 		/**
 		 * List of chapters
 		 */
-		chapters: List<MangaChapter>? = null,
+		chapters: List<Episode>? = null,
 		/**
-		 * Manga source
+		 * Media source
 		 */
-		source: MangaSource,
+		source: MediaSource,
 	) : this(
 		id = id,
 		title = title,
@@ -156,7 +156,7 @@ public data class Manga(
 	)
 
 	/**
-	 * Author of the manga, may be null
+	 * Author of the media, may be null
 	 */
 	@Deprecated("Please use authors")
 	public val author: String?
@@ -170,7 +170,7 @@ public data class Manga(
 		get() = altTitles.firstOrNull()
 
 	/**
-	 * Return if manga has a specified rating
+	 * Return if media has a specified rating
 	 * @see rating
 	 */
 	public val hasRating: Boolean
@@ -180,22 +180,22 @@ public data class Manga(
 	public val isNsfw: Boolean
 		get() = contentRating == ContentRating.ADULT
 
-	public fun getChapters(branch: String?): List<MangaChapter> {
-		return chapters?.filter { x -> x.branch == branch }.orEmpty()
+	public fun getEpisodes(dub: String?): List<Episode> {
+		return chapters?.filter { x -> x.dub == dub }.orEmpty()
 	}
 
-	public fun findChapterById(id: Long): MangaChapter? = chapters?.findById(id)
+	public fun findEpisodeById(id: Long): Episode? = chapters?.findById(id)
 
-	public fun requireChapterById(id: Long): MangaChapter = findChapterById(id)
-		?: throw NoSuchElementException("Chapter with id $id not found")
+	public fun requireEpisodeById(id: Long): Episode = findEpisodeById(id)
+		?: throw NoSuchElementException("Episode with id $id not found")
 
-	public fun getBranches(): Map<String?, Int> {
+	public fun getSeasons(): Map<String?, Int> {
 		if (chapters.isNullOrEmpty()) {
 			return emptyMap()
 		}
 		val result = ArrayMap<String?, Int>()
 		chapters.forEach {
-			val key = it.branch
+			val key = it.dub
 			result[key] = result.getOrDefault(key, 0) + 1
 		}
 		return result

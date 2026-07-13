@@ -1,6 +1,6 @@
 package tsuki.model
 
-public interface MangaSource {
+public interface MediaSource {
 
 	public val name: String
 	public val title: String get() = name

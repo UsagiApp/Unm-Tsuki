@@ -2,14 +2,11 @@ package tsuki.model
 
 public enum class ContentType {
 
-	/**
-	 * Standard manga, manhua, webtoons, etc
-	 */
-	MANGA,
+	ANIME,
 
-	MANHWA,
+	MOVIE,
 
-	MANHUA,
+	TV_SERIES,
 
 	/**
 	 * Use this if the source provides mostly nsfw content.
@@ -17,20 +14,16 @@ public enum class ContentType {
 	HENTAI,
 
 	/**
-	 * Western comics
+	 * Western animation
 	 */
-	COMICS,
+	OVA,
 
-	NOVEL,
+	SPECIAL,
 
-	/**
-	 * Use this type if no other suits your needs. For example, for an indie manga
-	 */
-
-	ONE_SHOT,
-	DOUJINSHI,
-	IMAGE_SET,
-	ARTIST_CG,
+	MUSIC_VIDEO,
+	LIVE_ACTION,
+	DOCUMENTARY,
+	SHORT_FILM,
 	GAME_CG,
 	OTHER,
 }

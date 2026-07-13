@@ -3,19 +3,19 @@ package tsuki.model
 import tsuki.InternalParsersApi
 import java.util.*
 
-public data class MangaListFilterOptions @InternalParsersApi constructor(
+public data class MediaListFilterOptions @InternalParsersApi constructor(
 
 	/**
 	 * Available tags (genres)
 	 */
-	public val availableTags: Set<MangaTag> = emptySet(),
+	public val availableTags: Set<MediaTag> = emptySet(),
 
 	/**
-	 * Supported [MangaState] variants for filtering. May be empty.
+	 * Supported [MediaState] variants for filtering. May be empty.
 	 *
 	 * For better performance use [EnumSet] for more than one item.
 	 */
-	public val availableStates: Set<MangaState> = emptySet(),
+	public val availableStates: Set<MediaState> = emptySet(),
 
 	/**
 	 * Supported [ContentRating] variants for filtering. May be empty.
@@ -30,13 +30,6 @@ public data class MangaListFilterOptions @InternalParsersApi constructor(
 	 * For better performance use [EnumSet] for more than one item.
 	 */
 	public val availableContentTypes: Set<ContentType> = emptySet(),
-
-	/**
-	 * Supported [Demographic] variants for filtering. May be empty.
-	 *
-	 * For better performance use [EnumSet] for more than one item.
-	 */
-	public val availableDemographics: Set<Demographic> = emptySet(),
 
 	/**
 	 * Supported content locales for multilingual sources

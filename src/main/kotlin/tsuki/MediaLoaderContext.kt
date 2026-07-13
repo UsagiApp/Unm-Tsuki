@@ -6,20 +6,20 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import tsuki.bitmap.Bitmap
-import tsuki.config.MangaSourceConfig
-import tsuki.model.MangaSource
+import tsuki.config.MediaSourceConfig
+import tsuki.model.MediaSource
 import tsuki.util.LinkResolver
 import java.util.*
 
-public abstract class MangaLoaderContext {
+public abstract class MediaLoaderContext {
 
 	public abstract val httpClient: OkHttpClient
 
 	public abstract val cookieJar: CookieJar
 
-	public abstract fun newParserInstance(source: MangaSource): MangaParser
+	public abstract fun newParserInstance(source: MediaSource): MediaParser
 
-	public abstract fun getParserSources(): List<MangaSource>
+	public abstract fun getParserSources(): List<MediaSource>
 
 	public fun newLinkResolver(link: HttpUrl): LinkResolver = LinkResolver(link, context = this)
 
@@ -50,11 +50,11 @@ public abstract class MangaLoaderContext {
 	/**
 	 * Open [url] in browser for some external action (e.g. captcha solving or non cookie-based authorization)
 	 */
-	public open fun requestBrowserAction(parser: MangaParser, url: String): Nothing {
+	public open fun requestBrowserAction(parser: MediaParser, url: String): Nothing {
 		throw UnsupportedOperationException("Browser is not available")
 	}
 
-	public abstract fun getConfig(source: MangaSource): MangaSourceConfig
+	public abstract fun getConfig(source: MediaSource): MediaSourceConfig
 
 	public abstract fun getDefaultUserAgent(): String
 

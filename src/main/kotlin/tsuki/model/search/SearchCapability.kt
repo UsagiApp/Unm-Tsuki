@@ -5,7 +5,7 @@ package tsuki.model.search
 import kotlin.reflect.KClass
 
 /**
- * Defines the search capabilities of a given field in the manga search query.
+ * Defines the search capabilities of a given field in the media search query.
  *
  * @property field The searchable field that this capability applies to.
  * 		Example values:

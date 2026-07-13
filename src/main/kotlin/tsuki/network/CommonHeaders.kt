@@ -72,6 +72,6 @@ public object CommonHeaders {
 	const val UPGRADE_INSECURE_REQUESTS: String = "Upgrade-Insecure-Requests"
 
 	/* Some custom headers */
-	const val MANGA_SOURCE: String = "X-Manga-Source"
+	const val MANGA_SOURCE: String = "X-Media-Source"
 	const val TOKEN: String = "Token"
 }

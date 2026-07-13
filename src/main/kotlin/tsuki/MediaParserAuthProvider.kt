@@ -1,6 +1,6 @@
 package tsuki
 
-public interface MangaParserAuthProvider {
+public interface MediaParserAuthProvider {
 
 	/**
 	 * URL for authentication web page, if applicable.

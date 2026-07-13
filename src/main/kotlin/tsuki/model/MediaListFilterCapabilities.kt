@@ -2,25 +2,25 @@ package tsuki.model
 
 import tsuki.InternalParsersApi
 
-public data class MangaListFilterCapabilities @InternalParsersApi constructor(
+public data class MediaListFilterCapabilities @InternalParsersApi constructor(
 
 	/**
 	 * Whether parser supports filtering by more than one tag
-	 * @see [MangaListFilter.tags]
-	 * @see [MangaListFilterOptions.availableTags]
+	 * @see [MediaListFilter.tags]
+	 * @see [MediaListFilterOptions.availableTags]
 	 */
 	val isMultipleTagsSupported: Boolean = false,
 
 	/**
 	 * Whether parser supports tagsExclude field in filter
-	 * @see [MangaListFilter.tagsExclude]
-	 * @see [MangaListFilterOptions.availableTags]
+	 * @see [MediaListFilter.tagsExclude]
+	 * @see [MediaListFilterOptions.availableTags]
 	 */
 	val isTagsExclusionSupported: Boolean = false,
 
 	/**
 	 * Whether parser supports searching by string query
-	 * @see [MangaListFilter.query]
+	 * @see [MediaListFilter.query]
 	 */
 	val isSearchSupported: Boolean = false,
 
@@ -31,26 +31,26 @@ public data class MangaListFilterCapabilities @InternalParsersApi constructor(
 
 	/**
 	 * Whether parser supports searching/filtering by year
-	 * @see [MangaListFilter.year]
+	 * @see [MediaListFilter.year]
 	 */
 	val isYearSupported: Boolean = false,
 
 	/**
 	 * Whether parser supports searching by year range
-	 * @see [MangaListFilter.yearFrom] and [MangaListFilter.yearTo]
+	 * @see [MediaListFilter.yearFrom] and [MediaListFilter.yearTo]
 	 */
 	val isYearRangeSupported: Boolean = false,
 
 	/**
 	 * Whether parser supports searching Original Languages
-	 * @see [MangaListFilter.originalLocale]
-	 * @see [MangaListFilterOptions.availableLocales]
+	 * @see [MediaListFilter.originalLocale]
+	 * @see [MediaListFilterOptions.availableLocales]
 	 */
 	val isOriginalLocaleSupported: Boolean = false,
 
 	/**
 	 * Whether parser supports searching by author name
-	 * @see [MangaListFilter.author]
+	 * @see [MediaListFilter.author]
 	 */
 	val isAuthorSearchSupported: Boolean = false,
 )

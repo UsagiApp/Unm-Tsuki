@@ -1,16 +1,16 @@
 package tsuki.util
 
 import kotlinx.coroutines.*
-import tsuki.MangaParser
-import tsuki.model.Manga
-import tsuki.model.MangaListFilter
+import tsuki.MediaParser
+import tsuki.model.Media
+import tsuki.model.MediaListFilter
 import tsuki.model.SortOrder
 
-public class RelatedMangaFinder(
-    private val parsers: Collection<MangaParser>,
+public class RelatedMediaFinder(
+    private val parsers: Collection<MediaParser>,
 ) {
 
-    public suspend operator fun invoke(seed: Manga): List<Manga> = withContext(Dispatchers.Default) {
+    public suspend operator fun invoke(seed: Media): List<Media> = withContext(Dispatchers.Default) {
         coroutineScope {
             parsers.singleOrNull()?.let { parser ->
                 findRelatedImpl(this, parser, seed)
@@ -22,7 +22,7 @@ public class RelatedMangaFinder(
         }
     }
 
-    private suspend fun findRelatedImpl(scope: CoroutineScope, parser: MangaParser, seed: Manga): List<Manga> {
+    private suspend fun findRelatedImpl(scope: CoroutineScope, parser: MediaParser, seed: Media): List<Media> {
         val words = HashSet<String>()
         words += seed.title.splitByWhitespace()
         seed.altTitles.forEach {
@@ -40,7 +40,7 @@ public class RelatedMangaFinder(
                     } else {
                         parser.availableSortOrders.first()
                     },
-                    MangaListFilter(
+                    MediaListFilter(
                         query = keyword,
                     ),
                 )
@@ -50,7 +50,7 @@ public class RelatedMangaFinder(
         return results.minBy { if (it.isEmpty()) Int.MAX_VALUE else it.size }
     }
 
-    private fun Manga.containKeyword(keyword: String): Boolean {
+    private fun Media.containKeyword(keyword: String): Boolean {
         return title.contains(keyword, ignoreCase = true)
             || altTitles.any { it.contains(keyword, ignoreCase = true) }
     }

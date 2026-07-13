@@ -1,9 +1,9 @@
 package tsuki
 
 import tsuki.config.ConfigKey
-import tsuki.config.MangaSourceConfig
+import tsuki.config.MediaSourceConfig
 
-internal class SourceConfigMock : MangaSourceConfig {
+internal class SourceConfigMock : MediaSourceConfig {
 
 	override fun <T> get(key: ConfigKey<T>): T = key.defaultValue
 }

@@ -3,23 +3,23 @@ package tsuki
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
-import tsuki.model.MangaParserSource
+import tsuki.model.MediaParserSource
 import tsuki.util.runCatchingCancellable
 
 class AuthCheckExtension : BeforeAllCallback {
 
-	private val loaderContext: MangaLoaderContext = MangaLoaderContextMock
+	private val loaderContext: MediaLoaderContext = MediaLoaderContextMock
 
 	override fun beforeAll(context: ExtensionContext) {
-		for (source in MangaParserSource.entries) {
+		for (source in MediaParserSource.entries) {
 			val parser = loaderContext.newParserInstance(source)
-			if (parser is MangaParserAuthProvider) {
+			if (parser is MediaParserAuthProvider) {
 				checkAuthorization(source, parser)
 			}
 		}
 	}
 
-	private fun checkAuthorization(source: MangaParserSource, parser: MangaParserAuthProvider) = runTest {
+	private fun checkAuthorization(source: MediaParserSource, parser: MediaParserAuthProvider) = runTest {
 		runCatchingCancellable {
 			parser.getUsername()
 		}.onSuccess { username ->

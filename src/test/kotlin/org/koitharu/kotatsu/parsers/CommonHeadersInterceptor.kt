@@ -3,8 +3,8 @@ package tsuki
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import tsuki.model.MangaParserSource
-import tsuki.model.MangaSource
+import tsuki.model.MediaParserSource
+import tsuki.model.MediaSource
 
 private const val HEADER_REFERER = CommonHeaders.REFERER
 
@@ -12,9 +12,9 @@ internal class CommonHeadersInterceptor : Interceptor {
 
 	override fun intercept(chain: Interceptor.Chain): Response {
 		val request = chain.request()
-		val source = request.tag(MangaSource::class.java)
-		val parser = if (source is MangaParserSource) {
-			MangaLoaderContextMock.newParserInstance(source)
+		val source = request.tag(MediaSource::class.java)
+		val parser = if (source is MediaParserSource) {
+			MediaLoaderContextMock.newParserInstance(source)
 		} else {
 			null
 		}

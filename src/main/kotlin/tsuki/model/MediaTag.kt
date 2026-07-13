@@ -1,6 +1,6 @@
 package tsuki.model
 
-public data class MangaTag(
+public data class MediaTag(
 	/**
 	 * User-readable tag title, should be in Title case
 	 */
@@ -9,5 +9,5 @@ public data class MangaTag(
 	 * Identifier of a tag, must be unique among the source.
 	 */
 	@JvmField public val key: String,
-	@JvmField public val source: MangaSource,
+	@JvmField public val source: MediaSource,
 )

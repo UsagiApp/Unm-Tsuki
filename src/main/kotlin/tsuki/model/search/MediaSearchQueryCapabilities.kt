@@ -6,15 +6,15 @@ import androidx.collection.ArraySet
 import tsuki.model.search.QueryCriteria.*
 import tsuki.util.mapToSet
 
-@Deprecated("Too complex. Use MangaListFilterCapabilities instead")
+@Deprecated("Too complex. Use MediaListFilterCapabilities instead")
 @ExposedCopyVisibility
-public data class MangaSearchQueryCapabilities internal constructor(
+public data class MediaSearchQueryCapabilities internal constructor(
 	public val capabilities: Set<SearchCapability>,
 ) {
 
 	public constructor(vararg capabilities: SearchCapability) : this(ArraySet(capabilities))
 
-	public fun validate(query: MangaSearchQuery) {
+	public fun validate(query: MediaSearchQuery) {
 		val strictFields = capabilities.filter { it.isExclusive }.mapToSet { it.field }
 		val usedStrictFields = query.criteria.mapToSet { it.field }.intersect(strictFields)
 

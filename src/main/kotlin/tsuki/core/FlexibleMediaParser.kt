@@ -8,34 +8,34 @@ import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Response
 import tsuki.InternalParsersApi
-import tsuki.MangaLoaderContext
-import tsuki.MangaParser
+import tsuki.MediaLoaderContext
+import tsuki.MediaParser
 import tsuki.config.ConfigKey
-import tsuki.config.MangaSourceConfig
+import tsuki.config.MediaSourceConfig
 import tsuki.model.*
-import tsuki.model.search.MangaSearchQuery
-import tsuki.model.search.MangaSearchQueryCapabilities
+import tsuki.model.search.MediaSearchQuery
+import tsuki.model.search.MediaSearchQueryCapabilities
 import tsuki.network.CommonHeaders
 import tsuki.network.OkHttpWebClient
 import tsuki.network.WebClient
 import tsuki.util.*
 import java.util.*
 
-@Deprecated("Too complex. Use AbstractMangaParser instead")
-public abstract class FlexibleMangaParser @InternalParsersApi constructor(
-	@property:InternalParsersApi public val context: MangaLoaderContext,
-	public final override val source: MangaSource,
-) : MangaParser {
+@Deprecated("Too complex. Use AbstractMediaParser instead")
+public abstract class FlexibleMediaParser @InternalParsersApi constructor(
+	@property:InternalParsersApi public val context: MediaLoaderContext,
+	public final override val source: MediaSource,
+) : MediaParser {
 
-	override val config: MangaSourceConfig by lazy { context.getConfig(source) }
+	override val config: MediaSourceConfig by lazy { context.getConfig(source) }
 
 	public open val sourceLocale: Locale
 		get() = if (source.locale.isEmpty()) Locale.ROOT else Locale(source.locale)
 
 	protected open val userAgentKey: ConfigKey.UserAgent = ConfigKey.UserAgent(context.getDefaultUserAgent())
 
-	public final override val filterCapabilities: MangaListFilterCapabilities
-		get() = searchQueryCapabilities.toMangaListFilterCapabilities()
+	public final override val filterCapabilities: MediaListFilterCapabilities
+		get() = searchQueryCapabilities.toMediaListFilterCapabilities()
 
 	protected val sourceContentRating: ContentRating?
 		get() = if (source.contentType == ContentType.HENTAI) {
@@ -66,10 +66,10 @@ public abstract class FlexibleMangaParser @InternalParsersApi constructor(
 	/**
 	 * Fetch direct link to the page image.
 	 */
-	public override suspend fun getPageUrl(page: MangaPage): String = page.url.toAbsoluteUrl(domain)
+	public override suspend fun getVideoUrl(page: VideoSource): String = page.url.toAbsoluteUrl(domain)
 
-	public final override suspend fun getList(offset: Int, order: SortOrder, filter: MangaListFilter): List<Manga> {
-		return getList(convertToMangaSearchQuery(offset, order, filter))
+	public final override suspend fun getList(offset: Int, order: SortOrder, filter: MediaListFilter): List<Media> {
+		return getList(convertToMediaSearchQuery(offset, order, filter))
 	}
 
 	/**
@@ -84,16 +84,16 @@ public abstract class FlexibleMangaParser @InternalParsersApi constructor(
 		keys.add(configKeyDomain)
 	}
 
-	public override suspend fun getRelatedManga(seed: Manga): List<Manga> {
-		return RelatedMangaFinder(listOf(this)).invoke(seed)
+	public override suspend fun getRelatedMedia(seed: Media): List<Media> {
+		return RelatedMediaFinder(listOf(this)).invoke(seed)
 	}
 
 	/**
-	 * Return [Manga] object by web link to it
-	 * @see [Manga.publicUrl]
+	 * Return [Media] object by web link to it
+	 * @see [Media.publicUrl]
 	 */
 	@Deprecated("Use resolveLink(HttpUrl) instead")
-    override suspend fun resolveLink(resolver: LinkResolver, link: HttpUrl): Manga? = null
+    override suspend fun resolveLink(resolver: LinkResolver, link: HttpUrl): Media? = null
 
 	override fun intercept(chain: Interceptor.Chain): Response = chain.proceed(chain.request())
 }

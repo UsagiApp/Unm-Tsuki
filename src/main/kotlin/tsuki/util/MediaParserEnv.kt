@@ -4,21 +4,21 @@ import okhttp3.HttpUrl
 import org.jsoup.nodes.Element
 import tsuki.ErrorMessages
 import tsuki.InternalParsersApi
-import tsuki.MangaParser
-import tsuki.core.AbstractMangaParser
+import tsuki.MediaParser
+import tsuki.core.AbstractMediaParser
 import tsuki.exception.ParseException
 import tsuki.model.*
 
 
 /**
- * Create a unique id for [Manga]/[MangaChapter]/[MangaPage].
- * @param source the manga source
+ * Create a unique id for [Media]/[Episode]/[VideoSource].
+ * @param source the media source
  * @param url must be relative url, without a domain
- * @see [Manga.id]
- * @see [MangaChapter.id]
- * @see [MangaPage.id]
+ * @see [Media.id]
+ * @see [Episode.id]
+ * @see [VideoSource.id]
  */
-public fun generateUid(source: MangaSource, url: String): Long {
+public fun generateUid(source: MediaSource, url: String): Long {
 	var h = LONG_HASH_SEED
 	source.name.forEach { c ->
 		h = 31 * h + c.code
@@ -30,14 +30,14 @@ public fun generateUid(source: MangaSource, url: String): Long {
 }
 
 /**
- * Create a unique id for [Manga]/[MangaChapter]/[MangaPage].
- * @param source the manga source
+ * Create a unique id for [Media]/[Episode]/[VideoSource].
+ * @param source the media source
  * @param id an internal identifier
- * @see [Manga.id]
- * @see [MangaChapter.id]
- * @see [MangaPage.id]
+ * @see [Media.id]
+ * @see [Episode.id]
+ * @see [VideoSource.id]
  */
-public fun generateUid(source: MangaSource, id: Long): Long {
+public fun generateUid(source: MediaSource, id: Long): Long {
 	var h = LONG_HASH_SEED
 	source.name.forEach { c ->
 		h = 31 * h + c.code
@@ -52,23 +52,18 @@ public fun Element.parseFailed(message: String? = null): Nothing {
 }
 
 @InternalParsersApi
-public fun Set<MangaTag>?.oneOrThrowIfMany(): MangaTag? = oneOrThrowIfMany(
+public fun Set<MediaTag>?.oneOrThrowIfMany(): MediaTag? = oneOrThrowIfMany(
 	ErrorMessages.FILTER_MULTIPLE_GENRES_NOT_SUPPORTED,
 )
 
 @InternalParsersApi
-public fun Set<MangaState>?.oneOrThrowIfMany(): MangaState? = oneOrThrowIfMany(
+public fun Set<MediaState>?.oneOrThrowIfMany(): MediaState? = oneOrThrowIfMany(
 	ErrorMessages.FILTER_MULTIPLE_STATES_NOT_SUPPORTED,
 )
 
 @InternalParsersApi
 public fun Set<ContentType>?.oneOrThrowIfMany(): ContentType? = oneOrThrowIfMany(
 	ErrorMessages.FILTER_MULTIPLE_CONTENT_TYPES_NOT_SUPPORTED,
-)
-
-@InternalParsersApi
-public fun Set<Demographic>?.oneOrThrowIfMany(): Demographic? = oneOrThrowIfMany(
-	ErrorMessages.FILTER_MULTIPLE_DEMOGRAPHICS_NOT_SUPPORTED,
 )
 
 @InternalParsersApi
@@ -88,17 +83,17 @@ public fun urlBuilder(domain: String, subdomain: String? = null): HttpUrl.Builde
 		.host(if (subdomain == null) domain else "$subdomain.$domain")
 }
 
-public fun MangaParser.generateUid(url: String): Long =
+public fun MediaParser.generateUid(url: String): Long =
 	tsuki.util.generateUid(source, url)
 
-public fun MangaParser.generateUid(id: Long): Long =
+public fun MediaParser.generateUid(id: Long): Long =
 	tsuki.util.generateUid(source, id)
 
 
-public fun MangaParser.urlBuilder(subdomain: String? = null): HttpUrl.Builder =
+public fun MediaParser.urlBuilder(subdomain: String? = null): HttpUrl.Builder =
 	tsuki.util.urlBuilder(domain, subdomain)
 
 @InternalParsersApi
-public fun getDomain(parser: MangaParser, subdomain: String): String {
+public fun getDomain(parser: MediaParser, subdomain: String): String {
 	return subdomain + "." + parser.domain.removePrefix("www.")
 }

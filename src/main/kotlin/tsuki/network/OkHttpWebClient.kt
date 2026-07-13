@@ -8,14 +8,14 @@ import org.jsoup.HttpStatusException
 import tsuki.exception.AuthRequiredException
 import tsuki.exception.GraphQLException
 import tsuki.exception.NotFoundException
-import tsuki.model.MangaSource
+import tsuki.model.MediaSource
 import tsuki.util.await
 import tsuki.util.parseJson
 import java.net.HttpURLConnection
 
 public class OkHttpWebClient(
 	private val httpClient: OkHttpClient,
-	private val mangaSource: MangaSource,
+	private val mangaSource: MediaSource,
 ) : WebClient {
 
 	override suspend fun httpGet(url: HttpUrl, extraHeaders: Headers?): Response {
@@ -99,7 +99,7 @@ public class OkHttpWebClient(
 	}
 
 	private fun Request.Builder.addTags(): Request.Builder {
-		tag(MangaSource::class.java, mangaSource)
+		tag(MediaSource::class.java, mangaSource)
 		return this
 	}
 
@@ -113,7 +113,7 @@ public class OkHttpWebClient(
 	private fun Response.ensureSuccess(): Response {
 		val exception: Exception? = when (code) { // Catch some error codes, not all
 			HttpURLConnection.HTTP_NOT_FOUND -> NotFoundException(message, request.url.toString())
-			HttpURLConnection.HTTP_UNAUTHORIZED -> request.tag(MangaSource::class.java)?.let {
+			HttpURLConnection.HTTP_UNAUTHORIZED -> request.tag(MediaSource::class.java)?.let {
 				AuthRequiredException(it)
 			} ?: HttpStatusException(message, code, request.url.toString())
 

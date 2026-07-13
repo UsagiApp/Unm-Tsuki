@@ -4,29 +4,29 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import tsuki.model.ContentRating
-import tsuki.model.ContentType.MANGA
+import tsuki.model.ContentType.ANIME
 import tsuki.model.ContentType.MANHUA
 import tsuki.model.Demographic.SEINEN
-import tsuki.model.MangaParserSource
-import tsuki.model.MangaState
-import tsuki.model.MangaTag
-import tsuki.model.search.MangaSearchQuery
+import tsuki.model.MediaParserSource
+import tsuki.model.MediaState
+import tsuki.model.MediaTag
+import tsuki.model.search.MediaSearchQuery
 import tsuki.model.search.QueryCriteria.*
 import tsuki.model.search.SearchableField.*
 import java.util.*
 
-class ConvertToMangaListFilterTest {
+class ConvertToMediaListFilterTest {
 
     @Test
-    fun convertToMangaListFilterTest() {
-        val tags = setOf(buildMangaTag("tag1"), buildMangaTag("tag2"))
-        val excludedTags = setOf(buildMangaTag("exclude_tag"))
-        val states = setOf(MangaState.ONGOING)
+    fun convertToMediaListFilterTest() {
+        val tags = setOf(buildMediaTag("tag1"), buildMediaTag("tag2"))
+        val excludedTags = setOf(buildMediaTag("exclude_tag"))
+        val states = setOf(MediaState.ONGOING)
         val contentRatings = setOf(ContentRating.SAFE)
-        val contentTypes = setOf(MANGA, MANHUA)
+        val contentTypes = setOf(ANIME, MOVIE)
         val demographics = setOf(SEINEN)
 
-        val query = MangaSearchQuery.Builder()
+        val query = MediaSearchQuery.Builder()
             .criterion(Match(TITLE_NAME, "title_name"))
             .criterion(Include(TAG, tags))
             .criterion(Exclude(TAG, excludedTags))
@@ -40,7 +40,7 @@ class ConvertToMangaListFilterTest {
             .criterion(Match(PUBLICATION_YEAR, 2020))
             .build()
 
-        val listFilter = convertToMangaListFilter(query)
+        val listFilter = convertToMediaListFilter(query)
 
         assertEquals(listFilter.query, "title_name")
         assertEquals(listFilter.tags, tags)
@@ -57,38 +57,38 @@ class ConvertToMangaListFilterTest {
     }
 
     @Test
-    fun convertToMangaListFilterWithMultipleTagsIncludeTest() {
-        val tags1 = setOf(buildMangaTag("tag1"), buildMangaTag("tag2"))
-        val tags2 = setOf(buildMangaTag("tag3"), buildMangaTag("tag4"))
+    fun convertToMediaListFilterWithMultipleTagsIncludeTest() {
+        val tags1 = setOf(buildMediaTag("tag1"), buildMediaTag("tag2"))
+        val tags2 = setOf(buildMediaTag("tag3"), buildMediaTag("tag4"))
 
-        val query = MangaSearchQuery.Builder()
+        val query = MediaSearchQuery.Builder()
             .criterion(Include(TAG, tags1))
             .criterion(Include(TAG, tags2))
             .build()
 
-        val listFilter = convertToMangaListFilter(query)
+        val listFilter = convertToMediaListFilter(query)
 
         assertEquals(listFilter.tags, tags1 union tags2)
     }
 
     @Test
-    fun convertToMangaListFilterWithUnsupportedFieldTest() {
-        val query = MangaSearchQuery.Builder()
-            .criterion(Include(AUTHOR, setOf(buildMangaTag("author"))))
+    fun convertToMediaListFilterWithUnsupportedFieldTest() {
+        val query = MediaSearchQuery.Builder()
+            .criterion(Include(AUTHOR, setOf(buildMediaTag("author"))))
             .build()
 
         val exception = assertThrows<IllegalArgumentException> {
-            convertToMangaListFilter(query)
+            convertToMediaListFilter(query)
         }
 
         assert(exception.message!!.contains("Unsupported field for Include criterion: AUTHOR"))
     }
 
-    private fun buildMangaTag(name: String): MangaTag {
-        return MangaTag(
+    private fun buildMediaTag(name: String): MediaTag {
+        return MediaTag(
             key = "${name}Key",
             title = name,
-            source = MangaParserSource.MANGADEX,
+            source = MediaParserSource.MANGADEX,
         )
     }
 }

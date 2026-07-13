@@ -3,20 +3,20 @@
 package tsuki.core
 
 import androidx.annotation.VisibleForTesting
-import tsuki.MangaLoaderContext
-import tsuki.model.Manga
-import tsuki.model.MangaSource
-import tsuki.model.search.MangaSearchQuery
+import tsuki.MediaLoaderContext
+import tsuki.model.Media
+import tsuki.model.MediaSource
+import tsuki.model.search.MediaSearchQuery
 import tsuki.model.search.SearchableField
 import tsuki.util.Paginator
 
-@Deprecated("Too complex. Use PagedMangaParser instead")
-public abstract class FlexiblePagedMangaParser(
-	context: MangaLoaderContext,
-	source: MangaSource,
+@Deprecated("Too complex. Use PagedMediaParser instead")
+public abstract class FlexiblePagedMediaParser(
+	context: MediaLoaderContext,
+	source: MediaSource,
 	@VisibleForTesting(otherwise = VisibleForTesting.PROTECTED) @JvmField public val pageSize: Int,
 	searchPageSize: Int = pageSize,
-) : FlexibleMangaParser(context, source) {
+) : FlexibleMediaParser(context, source) {
 
 	@JvmField
 	protected val paginator: Paginator = Paginator(pageSize)
@@ -25,7 +25,7 @@ public abstract class FlexiblePagedMangaParser(
 	protected val searchPaginator: Paginator = Paginator(searchPageSize)
 
 	@Deprecated("Too complex. Use getList with filter instead")
-	final override suspend fun getList(query: MangaSearchQuery): List<Manga> {
+	final override suspend fun getList(query: MediaSearchQuery): List<Media> {
 		var containTitleNameCriteria = false
 		query.criteria.forEach {
 			if (it.field == SearchableField.TITLE_NAME) {
@@ -33,7 +33,7 @@ public abstract class FlexiblePagedMangaParser(
 			}
 		}
 
-		return searchManga(
+		return searchMedia(
 			paginator = if (containTitleNameCriteria) {
 				paginator
 			} else {
@@ -43,17 +43,17 @@ public abstract class FlexiblePagedMangaParser(
 		)
 	}
 
-	public abstract suspend fun getListPage(query: MangaSearchQuery, page: Int): List<Manga>
+	public abstract suspend fun getListPage(query: MediaSearchQuery, page: Int): List<Media>
 
 	protected fun setFirstPage(firstPage: Int, firstPageForSearch: Int = firstPage) {
 		paginator.firstPage = firstPage
 		searchPaginator.firstPage = firstPageForSearch
 	}
 
-	private suspend fun searchManga(
+	private suspend fun searchMedia(
 		paginator: Paginator,
-		query: MangaSearchQuery,
-	): List<Manga> {
+		query: MediaSearchQuery,
+	): List<Media> {
 		val offset: Int = query.offset
 		val page = paginator.getPage(offset)
 		val list = getListPage(query, page)

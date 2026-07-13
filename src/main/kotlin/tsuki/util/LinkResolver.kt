@@ -4,31 +4,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import tsuki.MangaLoaderContext
-import tsuki.MangaParser
+import tsuki.MediaLoaderContext
+import tsuki.MediaParser
 import tsuki.model.*
 
 public class LinkResolver(
 	public val link: HttpUrl,
-	public val context: MangaLoaderContext? = null,
-	public val parser: MangaParser? = null,
+	public val context: MediaLoaderContext? = null,
+	public val parser: MediaParser? = null,
 ) {
 
-	public suspend fun getSource(): MangaSource? = parser?.source
+	public suspend fun getSource(): MediaSource? = parser?.source
 
-	public suspend fun getManga(): Manga? {
+	public suspend fun getMedia(): Media? {
 		val p = parser ?: return null // TODO: implement global link resolution via context
-		return p.resolveLink(link) ?: resolveManga(p)
+		return p.resolveLink(link) ?: resolveMedia(p)
 	}
 
-	public suspend fun resolveManga(
-		parser: MangaParser,
+	public suspend fun resolveMedia(
+		parser: MediaParser,
 		url: String = link.toString().toRelativeUrl(link.host),
 		id: Long = generateUid(parser.source, url),
 		title: String = STUB_TITLE,
-	): Manga? = resolveBySeed(
+	): Media? = resolveBySeed(
 		parser,
-		Manga(
+		Media(
 			id = id,
 			title = title,
 			altTitles = emptySet(),
@@ -47,20 +47,20 @@ public class LinkResolver(
 		),
 	)
 
-	private suspend fun resolveBySeed(parser: MangaParser, s: Manga): Manga? {
+	private suspend fun resolveBySeed(parser: MediaParser, s: Media): Media? {
 		val seed = parser.getDetails(s)
 		if (!parser.filterCapabilities.isSearchSupported) {
-			return seed.takeUnless { it.chapters.isNullOrEmpty() }
+			return seed.takeUnless { it.episodes.isNullOrEmpty() }
 		}
 		val query = when {
 			seed.title != STUB_TITLE && seed.title.isNotEmpty() -> seed.title
 			seed.altTitles.isNotEmpty() -> seed.altTitles.first()
 			seed.authors.isNotEmpty() -> seed.authors.first()
-			else -> return seed // unfortunately we do not know a real manga title so unable to find it
+			else -> return seed // unfortunately we do not know a real media title so unable to find it
 		}
 		val resolved = runCatching {
-			val list = parser.getList(0, parser.bestSortOrder(), MangaListFilter(query = query))
-			list.singleOrNull { manga -> isSameUrl(manga.publicUrl) }
+			val list = parser.getList(0, parser.bestSortOrder(), MediaListFilter(query = query))
+			list.singleOrNull { media -> isSameUrl(media.publicUrl) }
 		}.getOrNull()
 		if (resolved == null) {
 			return seed
@@ -69,7 +69,7 @@ public class LinkResolver(
 			parser.getDetails(resolved)
 		}.getOrElse {
 			resolved.copy(
-				chapters = seed.chapters ?: resolved.chapters,
+				chapters = seed.episodes ?: resolved.episodes,
 				description = seed.description ?: resolved.description,
 				authors = seed.authors.ifEmpty { resolved.authors },
 				tags = seed.tags + resolved.tags,
@@ -90,7 +90,7 @@ public class LinkResolver(
 			&& link.encodedPath == httpUrl.encodedPath
 	}
 
-	private fun MangaParser.bestSortOrder(): SortOrder {
+	private fun MediaParser.bestSortOrder(): SortOrder {
 		val supported = availableSortOrders
 		if (SortOrder.RELEVANCE in supported) {
 			return SortOrder.RELEVANCE
@@ -99,6 +99,6 @@ public class LinkResolver(
 	}
 
 	private companion object {
-		const val STUB_TITLE = "Unknown manga"
+		const val STUB_TITLE = "Unknown media"
 	}
 }
