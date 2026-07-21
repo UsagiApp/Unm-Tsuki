@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.UsagiApp"
-version = "1.0.1"
+version = "1.0.0"
 
 kotlin {
     jvmToolchain(11)
@@ -62,7 +62,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/UsagiApp/Tsuki")
+            url = uri("https://maven.pkg.github.com/UsagiApp/Unm-Tsuki")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: ""
                 password = System.getenv("GITHUB_TOKEN") ?: ""
