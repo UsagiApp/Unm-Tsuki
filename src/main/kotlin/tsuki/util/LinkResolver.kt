@@ -50,7 +50,7 @@ public class LinkResolver(
 	private suspend fun resolveBySeed(parser: MediaParser, s: Media): Media? {
 		val seed = parser.getDetails(s)
 		if (!parser.filterCapabilities.isSearchSupported) {
-			return seed.takeUnless { it.episodes.isNullOrEmpty() }
+			return seed.takeUnless { it.chapters.isNullOrEmpty() }
 		}
 		val query = when {
 			seed.title != STUB_TITLE && seed.title.isNotEmpty() -> seed.title
@@ -69,7 +69,7 @@ public class LinkResolver(
 			parser.getDetails(resolved)
 		}.getOrElse {
 			resolved.copy(
-				chapters = seed.episodes ?: resolved.episodes,
+				chapters = seed.chapters ?: resolved.chapters,
 				description = seed.description ?: resolved.description,
 				authors = seed.authors.ifEmpty { resolved.authors },
 				tags = seed.tags + resolved.tags,
